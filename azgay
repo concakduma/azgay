@@ -1,0 +1,117 @@
+-- LocalScript (đặt trong StarterPlayerScripts)
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+-- TẠO GUI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "TeleportPanel"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = PlayerGui
+
+local frame = Instance.new("Frame")
+frame.Name = "MainFrame"
+frame.Size = UDim2.new(0, 220, 0, 100)
+frame.Position = UDim2.new(1, -240, 0.3, 0)
+frame.AnchorPoint = Vector2.new(0, 0)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.BorderSizePixel = 0
+frame.Active = true              -- cho phép drag
+frame.Draggable = true           -- cho phép drag
+frame.Parent = screenGui
+
+-- UICorner + Stroke để style “hiện đại”
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 8)
+corner.Parent = frame
+
+local stroke = Instance.new("UIStroke")
+stroke.Color = Color3.fromRGB(70, 70, 70)
+stroke.Thickness = 2
+stroke.Parent = frame
+
+-- Nút Goto
+local gotoBtn = Instance.new("TextButton")
+gotoBtn.Name = "GotoButton"
+gotoBtn.Size = UDim2.new(1, -20, 0, 36)
+gotoBtn.Position = UDim2.new(0, 10, 0, 10)
+gotoBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+gotoBtn.BorderSizePixel = 0
+gotoBtn.Text = "Goto"
+gotoBtn.Font = Enum.Font.GothamSemibold
+gotoBtn.TextSize = 20
+gotoBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+gotoBtn.Parent = frame
+
+local gotoCorner = Instance.new("UICorner")
+gotoCorner.CornerRadius = UDim.new(0, 6)
+gotoCorner.Parent = gotoBtn
+
+-- TextBox để nhập tên (ẩn ban đầu)
+local nameBox = Instance.new("TextBox")
+nameBox.Name = "NameInput"
+nameBox.Size = UDim2.new(1, -20, 0, 28)
+nameBox.Position = UDim2.new(0, 10, 0, 56)
+nameBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+nameBox.BorderSizePixel = 0
+nameBox.PlaceholderText = "Nhập tên player..."
+nameBox.Text = ""
+nameBox.ClearTextOnFocus = true
+nameBox.Visible = false
+nameBox.Font = Enum.Font.Gotham
+nameBox.TextSize = 18
+nameBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+nameBox.Parent = frame
+
+local boxCorner = Instance.new("UICorner")
+boxCorner.CornerRadius = UDim.new(0, 6)
+boxCorner.Parent = nameBox
+
+-- Hàm tìm player theo tên con (case-insensitive)
+local function findPlayerByPartial(namePart)
+    namePart = namePart:lower()
+    for _, pl in ipairs(Players:GetPlayers()) do
+        if pl.Name:lower():find(namePart, 1, true) then
+            return pl
+        end
+    end
+    return nil
+end
+
+-- Hàm teleport
+local function teleportToPlayer(targetPlayer)
+    if not targetPlayer or not targetPlayer.Character then return end
+    local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    local targetHrp = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if hrp and targetHrp then
+        hrp.CFrame = targetHrp.CFrame * CFrame.new(3, 0, 0) -- offset tránh chồng vào người kia
+    end
+end
+
+-- Sự kiện click nút Goto
+gotoBtn.MouseButton1Click:Connect(function()
+    nameBox.Visible = not nameBox.Visible
+    if nameBox.Visible then
+        nameBox:CaptureFocus()
+    end
+end)
+
+-- Khi người chơi nhấn Enter trong TextBox
+nameBox.FocusLost:Connect(function(enterPressed)
+    if not enterPressed then return end
+    local query = nameBox.Text:match("%S+")
+    if query and #query > 0 then
+        local target = findPlayerByPartial(query)
+        if target then
+            teleportToPlayer(target)
+        else
+            -- thông báo nếu không tìm thấy
+            local oldText = nameBox.Text
+            nameBox.Text = "Không tìm thấy: "..oldText
+            wait(1.5)
+            nameBox.Text = ""
+        end
+    end
+    nameBox.Visible = false
+end)
