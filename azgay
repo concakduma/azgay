@@ -1,117 +1,145 @@
--- LocalScript (đặt trong StarterPlayerScripts)
+-- Invisible Toggle Script
+-- GUI for Minecraft
+-- Version: 1.1 (Added minimize feature)
 
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+-- Create GUI Elements
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local TitleBar = Instance.new("TextLabel")
+local MinButton = Instance.new("TextButton")
+local ToggleButton = Instance.new("TextButton")
 
--- TẠO GUI
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "TeleportPanel"
-screenGui.ResetOnSpawn = false
-screenGui.Parent = PlayerGui
+-- Configure ScreenGui
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.ResetOnSpawn = false
+print("GUI loaded successfully!")
 
-local frame = Instance.new("Frame")
-frame.Name = "MainFrame"
-frame.Size = UDim2.new(0, 220, 0, 100)
-frame.Position = UDim2.new(1, -240, 0.3, 0)
-frame.AnchorPoint = Vector2.new(0, 0)
-frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-frame.BorderSizePixel = 0
-frame.Active = true              -- cho phép drag
-frame.Draggable = true           -- cho phép drag
-frame.Parent = screenGui
+-- Configure Main Frame
+Frame.Parent = ScreenGui
+Frame.BackgroundColor3 = Color3.fromRGB(196, 40, 28)
+Frame.BorderSizePixel = 0
+Frame.Position = UDim2.new(0.584, 0, 0.122, 0)
+Frame.Size = UDim2.new(0, 173, 0, 105)
+Frame.Active = true
+Frame.Draggable = true
 
--- UICorner + Stroke để style “hiện đại”
-local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 8)
-corner.Parent = frame
+-- Configure Title Bar
+TitleBar.Parent = Frame
+TitleBar.BackgroundColor3 = Color3.fromRGB(13, 105, 172)
+TitleBar.BorderSizePixel = 0
+TitleBar.Size = UDim2.new(0, 173, 0, 30)
+TitleBar.Font = Enum.Font.SourceSansBold
+TitleBar.Text = "Invisible Toggle"
+TitleBar.TextColor3 = Color3.fromRGB(245, 205, 48)
+TitleBar.TextSize = 18
 
-local stroke = Instance.new("UIStroke")
-stroke.Color = Color3.fromRGB(70, 70, 70)
-stroke.Thickness = 2
-stroke.Parent = frame
+-- Configure Minimize Button
+MinButton.Parent = TitleBar
+MinButton.BackgroundTransparency = 1
+MinButton.Text = "-"
+MinButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+MinButton.TextSize = 20
+MinButton.Size = UDim2.new(0, 25, 0, 25)
+MinButton.Position = UDim2.new(0.85, 0, 0.05, 0)
+MinButton.BorderSizePixel = 0
 
--- Nút Goto
-local gotoBtn = Instance.new("TextButton")
-gotoBtn.Name = "GotoButton"
-gotoBtn.Size = UDim2.new(1, -20, 0, 36)
-gotoBtn.Position = UDim2.new(0, 10, 0, 10)
-gotoBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-gotoBtn.BorderSizePixel = 0
-gotoBtn.Text = "Goto"
-gotoBtn.Font = Enum.Font.GothamSemibold
-gotoBtn.TextSize = 20
-gotoBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-gotoBtn.Parent = frame
+-- Configure Toggle Button
+ToggleButton.Parent = Frame
+ToggleButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.BorderSizePixel = 0
+ToggleButton.Position = UDim2.new(0.162, 0, 0.419, 0)
+ToggleButton.Size = UDim2.new(0, 117, 0, 33)
+ToggleButton.Font = Enum.Font.SourceSans
+ToggleButton.Text = "Click to become invisible"
+ToggleButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+ToggleButton.TextSize = 14
 
-local gotoCorner = Instance.new("UICorner")
-gotoCorner.CornerRadius = UDim.new(0, 6)
-gotoCorner.Parent = gotoBtn
+-- Minimize/Expand functionality
+local isMinimized = false
+local originalSize = Frame.Size
 
--- TextBox để nhập tên (ẩn ban đầu)
-local nameBox = Instance.new("TextBox")
-nameBox.Name = "NameInput"
-nameBox.Size = UDim2.new(1, -20, 0, 28)
-nameBox.Position = UDim2.new(0, 10, 0, 56)
-nameBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-nameBox.BorderSizePixel = 0
-nameBox.PlaceholderText = "Nhập tên player..."
-nameBox.Text = ""
-nameBox.ClearTextOnFocus = true
-nameBox.Visible = false
-nameBox.Font = Enum.Font.Gotham
-nameBox.TextSize = 18
-nameBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-nameBox.Parent = frame
+local function toggleMinimize()
+    isMinimized = not isMinimized
+    
+    if isMinimized then
+        Frame.Size = UDim2.new(originalSize.X.Scale, originalSize.X.Offset, 0, 30)
+        MinButton.Text = "+"
+        ToggleButton.Visible = false
+    else
+        Frame.Size = originalSize
+        MinButton.Text = "-"
+        ToggleButton.Visible = true
+    end
+end
 
-local boxCorner = Instance.new("UICorner")
-boxCorner.CornerRadius = UDim.new(0, 6)
-boxCorner.Parent = nameBox
+MinButton.MouseButton1Click:Connect(toggleMinimize)
 
--- Hàm tìm player theo tên con (case-insensitive)
-local function findPlayerByPartial(namePart)
-    namePart = namePart:lower()
-    for _, pl in ipairs(Players:GetPlayers()) do
-        if pl.Name:lower():find(namePart, 1, true) then
-            return pl
+-- Toggle Button Functionality
+local function setupToggleButton()
+    local isInvisible = false
+    
+    local function updateTransparency(character)
+        for _, part in ipairs(character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.LocalTransparencyModifier = isInvisible and 0.5 or 0
+            end
         end
     end
-    return nil
-end
-
--- Hàm teleport
-local function teleportToPlayer(targetPlayer)
-    if not targetPlayer or not targetPlayer.Character then return end
-    local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-    local targetHrp = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
-    if hrp and targetHrp then
-        hrp.CFrame = targetHrp.CFrame * CFrame.new(3, 0, 0) -- offset tránh chồng vào người kia
-    end
-end
-
--- Sự kiện click nút Goto
-gotoBtn.MouseButton1Click:Connect(function()
-    nameBox.Visible = not nameBox.Visible
-    if nameBox.Visible then
-        nameBox:CaptureFocus()
-    end
-end)
-
--- Khi người chơi nhấn Enter trong TextBox
-nameBox.FocusLost:Connect(function(enterPressed)
-    if not enterPressed then return end
-    local query = nameBox.Text:match("%S+")
-    if query and #query > 0 then
-        local target = findPlayerByPartial(query)
-        if target then
-            teleportToPlayer(target)
+    
+    local function toggleInvisibility()
+        isInvisible = not isInvisible
+        local player = game.Players.LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+        
+        if isInvisible then
+            -- Save position and move to secret location
+            local savedPosition = character.HumanoidRootPart.CFrame
+            character:MoveTo(Vector3.new(-25.95, 84, 3537.55))
+            
+            -- Create invisible seat
+            local seat = Instance.new("Seat")
+            seat.Name = "invischair"
+            seat.Anchored = false
+            seat.CanCollide = false
+            seat.Transparency = 1
+            seat.Position = Vector3.new(-25.95, 84, 3537.55)
+            seat.Parent = workspace
+            
+            -- Weld character to seat
+            local weld = Instance.new("Weld")
+            weld.Part0 = seat
+            weld.Part1 = character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso")
+            weld.Parent = seat
+            
+            -- Return to original position
+            seat.CFrame = savedPosition
+            ToggleButton.Text = "ON🛡️"
         else
-            -- thông báo nếu không tìm thấy
-            local oldText = nameBox.Text
-            nameBox.Text = "Không tìm thấy: "..oldText
-            wait(1.5)
-            nameBox.Text = ""
+            -- Remove invisibility seat if exists
+            local seat = workspace:FindFirstChild("invischair")
+            if seat then seat:Destroy() end
+            ToggleButton.Text = "OFF🛑"
         end
+        
+        updateTransparency(character)
     end
-    nameBox.Visible = false
-end)
+    
+    ToggleButton.MouseButton1Click:Connect(toggleInvisibility)
+    
+    -- Handle new characters
+    game.Players.LocalPlayer.CharacterAdded:Connect(function(character)
+        updateTransparency(character)
+    end)
+    
+    -- Send notification
+    task.wait(0.69)
+    game.StarterGui:SetCore("SendNotification", {
+        Title = "Loaded",
+        Text = "Invisibility toggle ready!",
+        Duration = 6
+    })
+end
+
+-- Initialize the button functionality
+coroutine.wrap(setupToggleButton)()
