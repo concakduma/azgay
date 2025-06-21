@@ -1,145 +1,157 @@
--- Invisible Toggle Script
--- GUI for Minecraft
--- Version: 1.1 (Added minimize feature)
-
--- Create GUI Elements
+-- invisible toggle script
+-- Gui to Minecraft
+-- Version: 9/11
+-- Instances:
 local ScreenGui = Instance.new("ScreenGui")
 local Frame = Instance.new("Frame")
-local TitleBar = Instance.new("TextLabel")
-local MinButton = Instance.new("TextButton")
-local ToggleButton = Instance.new("TextButton")
+local TextLabel = Instance.new("TextLabel")
+local TextButton = Instance.new("TextButton")
+local MinimizeButton = Instance.new("TextButton")
 
--- Configure ScreenGui
+--Properties:
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 ScreenGui.ResetOnSpawn = false
-print("GUI loaded successfully!")
+print("SGui loaded!")
 
--- Configure Main Frame
 Frame.Parent = ScreenGui
 Frame.BackgroundColor3 = Color3.fromRGB(196, 40, 28)
+Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 Frame.BorderSizePixel = 0
-Frame.Position = UDim2.new(0.584, 0, 0.122, 0)
+Frame.Position = UDim2.new(0.584415555, 0, 0.121844128, 0)
 Frame.Size = UDim2.new(0, 173, 0, 105)
 Frame.Active = true
 Frame.Draggable = true
 
--- Configure Title Bar
-TitleBar.Parent = Frame
-TitleBar.BackgroundColor3 = Color3.fromRGB(13, 105, 172)
-TitleBar.BorderSizePixel = 0
-TitleBar.Size = UDim2.new(0, 173, 0, 30)
-TitleBar.Font = Enum.Font.SourceSansBold
-TitleBar.Text = "Invisible Toggle"
-TitleBar.TextColor3 = Color3.fromRGB(245, 205, 48)
-TitleBar.TextSize = 18
+TextLabel.Parent = Frame
+TextLabel.BackgroundColor3 = Color3.fromRGB(13, 105, 172)
+TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TextLabel.BorderSizePixel = 0
+TextLabel.Size = UDim2.new(0, 173, 0, 30)
+TextLabel.Font = Enum.Font.SourceSansBold
+TextLabel.Text = "Invisible toggle"
+TextLabel.TextColor3 = Color3.fromRGB(245, 205, 48)
+TextLabel.TextSize = 18.000
 
--- Configure Minimize Button
-MinButton.Parent = TitleBar
-MinButton.BackgroundTransparency = 1
-MinButton.Text = "-"
-MinButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-MinButton.TextSize = 20
-MinButton.Size = UDim2.new(0, 25, 0, 25)
-MinButton.Position = UDim2.new(0.85, 0, 0.05, 0)
-MinButton.BorderSizePixel = 0
+TextButton.Parent = Frame
+TextButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TextButton.BorderSizePixel = 0
+TextButton.Position = UDim2.new(0.161849707, 0, 0.419047624, 0)
+TextButton.Size = UDim2.new(0, 117, 0, 33)
+TextButton.Font = Enum.Font.SourceSans
+TextButton.Text = "Click to become invisible"
+TextButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+TextButton.TextSize = 14.000
 
--- Configure Toggle Button
-ToggleButton.Parent = Frame
-ToggleButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-ToggleButton.BorderSizePixel = 0
-ToggleButton.Position = UDim2.new(0.162, 0, 0.419, 0)
-ToggleButton.Size = UDim2.new(0, 117, 0, 33)
-ToggleButton.Font = Enum.Font.SourceSans
-ToggleButton.Text = "Click to become invisible"
-ToggleButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-ToggleButton.TextSize = 14
+MinimizeButton.Parent = Frame
+MinimizeButton.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
+MinimizeButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+MinimizeButton.BorderSizePixel = 0
+MinimizeButton.Position = UDim2.new(0.826589644, 0, 0.0, 0)
+MinimizeButton.Size = UDim2.new(0, 30, 0, 30)
+MinimizeButton.Font = Enum.Font.SourceSansBold
+MinimizeButton.Text = "-"
+MinimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+MinimizeButton.TextSize = 20.000
 
--- Minimize/Expand functionality
-local isMinimized = false
-local originalSize = Frame.Size
-
-local function toggleMinimize()
-    isMinimized = not isMinimized
-    
-    if isMinimized then
-        Frame.Size = UDim2.new(originalSize.X.Scale, originalSize.X.Offset, 0, 30)
-        MinButton.Text = "+"
-        ToggleButton.Visible = false
-    else
-        Frame.Size = originalSize
-        MinButton.Text = "-"
-        ToggleButton.Visible = true
-    end
+-- Scripts:
+local function GNXDSUT_fake_script() -- TextButton.LocalScript 
+	local script = Instance.new('LocalScript', TextButton)
+	local TextButton = script.Parent
+	local MinimizeButton = script.Parent.Parent:FindFirstChild("TextButton")
+	local Frame = script.Parent.Parent
+	local invis_on = false
+	local isMinimized = false
+	local originalSize = Frame.Size
+	local originalPosition = Frame.Position
+	
+	-- Minimize/Maximize functionality
+	local function toggleMinimize()
+		isMinimized = not isMinimized
+		if isMinimized then
+			-- Hide everything except minimize button
+			for _, child in ipairs(Frame:GetChildren()) do
+				if child ~= MinimizeButton and child.Name ~= "TextButton" then
+					child.Visible = false
+				end
+			end
+			TextButton.Visible = false
+			Frame.Size = UDim2.new(0, 30, 0, 30)
+			MinimizeButton.Text = "+"
+			MinimizeButton.Size = UDim2.new(0, 30, 0, 30)
+			MinimizeButton.Position = UDim2.new(0, 0, 0, 0)
+		else
+			-- Show everything
+			for _, child in ipairs(Frame:GetChildren()) do
+				child.Visible = true
+			end
+			Frame.Size = originalSize
+			MinimizeButton.Text = "-"
+			MinimizeButton.Size = UDim2.new(0, 30, 0, 30)
+			MinimizeButton.Position = UDim2.new(0.826589644, 0, 0.0, 0)
+		end
+	end
+	
+	MinimizeButton.MouseButton1Click:Connect(toggleMinimize)
+	
+	local function makeTransparent(character)
+		for _, part in ipairs(character:GetDescendants()) do
+			if part:IsA("BasePart") then
+				part.LocalTransparencyModifier = invis_on and 0.5 or 0
+			end
+		end
+	end
+	
+	local function toggleInvisibility()
+		invis_on = not invis_on
+		local player = game.Players.LocalPlayer
+		local character = player.Character or player.CharacterAdded:Wait()
+	
+		if invis_on then
+			local savedpos = character.HumanoidRootPart.CFrame
+			wait()
+			character:MoveTo(Vector3.new(-25.95, 84, 3537.55))
+			wait(0.15)
+	
+			local Seat = Instance.new('Seat', game.Workspace)
+			Seat.Anchored = false
+			Seat.CanCollide = false
+			Seat.Name = 'invischair'
+			Seat.Transparency = 1
+			Seat.Position = Vector3.new(-25.95, 84, 3537.55)
+	
+			local Weld = Instance.new("Weld", Seat)
+			Weld.Part0 = Seat
+			Weld.Part1 = character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso")
+			wait()
+	
+			Seat.CFrame = savedpos
+			TextButton.Text = "ON🛡️"
+		else
+			local invisChair = workspace:FindFirstChild('invischair')
+			if invisChair then
+				invisChair:Destroy()
+			end
+			TextButton.Text = "OFF🛑"
+		end
+	
+		makeTransparent(character)
+	end
+	
+	TextButton.MouseButton1Click:Connect(toggleInvisibility)
+	
+	game.Players.LocalPlayer.CharacterAdded:Connect(function(character)
+		makeTransparent(character)
+	end)
+	
+	wait(.69)
+	
+	game.StarterGui:SetCore("SendNotification", {
+		Title = "loaded";
+		Text = "eeeeee";
+		Duration = 6;
+	})
 end
 
-MinButton.MouseButton1Click:Connect(toggleMinimize)
-
--- Toggle Button Functionality
-local function setupToggleButton()
-    local isInvisible = false
-    
-    local function updateTransparency(character)
-        for _, part in ipairs(character:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.LocalTransparencyModifier = isInvisible and 0.5 or 0
-            end
-        end
-    end
-    
-    local function toggleInvisibility()
-        isInvisible = not isInvisible
-        local player = game.Players.LocalPlayer
-        local character = player.Character or player.CharacterAdded:Wait()
-        
-        if isInvisible then
-            -- Save position and move to secret location
-            local savedPosition = character.HumanoidRootPart.CFrame
-            character:MoveTo(Vector3.new(-25.95, 84, 3537.55))
-            
-            -- Create invisible seat
-            local seat = Instance.new("Seat")
-            seat.Name = "invischair"
-            seat.Anchored = false
-            seat.CanCollide = false
-            seat.Transparency = 1
-            seat.Position = Vector3.new(-25.95, 84, 3537.55)
-            seat.Parent = workspace
-            
-            -- Weld character to seat
-            local weld = Instance.new("Weld")
-            weld.Part0 = seat
-            weld.Part1 = character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso")
-            weld.Parent = seat
-            
-            -- Return to original position
-            seat.CFrame = savedPosition
-            ToggleButton.Text = "ON🛡️"
-        else
-            -- Remove invisibility seat if exists
-            local seat = workspace:FindFirstChild("invischair")
-            if seat then seat:Destroy() end
-            ToggleButton.Text = "OFF🛑"
-        end
-        
-        updateTransparency(character)
-    end
-    
-    ToggleButton.MouseButton1Click:Connect(toggleInvisibility)
-    
-    -- Handle new characters
-    game.Players.LocalPlayer.CharacterAdded:Connect(function(character)
-        updateTransparency(character)
-    end)
-    
-    -- Send notification
-    task.wait(0.69)
-    game.StarterGui:SetCore("SendNotification", {
-        Title = "Loaded",
-        Text = "Invisibility toggle ready!",
-        Duration = 6
-    })
-end
-
--- Initialize the button functionality
-coroutine.wrap(setupToggleButton)()
+coroutine.wrap(GNXDSUT_fake_script)()
