@@ -45,6 +45,7 @@ TextButton.TextColor3 = Color3.fromRGB(0, 0, 0)
 TextButton.TextSize = 14.000
 
 MinimizeButton.Parent = Frame
+MinimizeButton.Name = "MinimizeBtn"
 MinimizeButton.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
 MinimizeButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
 MinimizeButton.BorderSizePixel = 0
@@ -56,26 +57,21 @@ MinimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 MinimizeButton.TextSize = 20.000
 
 -- Scripts:
-local function GNXDSUT_fake_script() -- TextButton.LocalScript 
-	local script = Instance.new('LocalScript', TextButton)
-	local TextButton = script.Parent
-	local MinimizeButton = script.Parent.Parent:FindFirstChild("TextButton")
-	local Frame = script.Parent.Parent
+local function GNXDSUT_fake_script() -- Main Script
+	local Frame = ScreenGui.Frame
+	local TextButton = Frame.TextButton
+	local MinimizeButton = Frame.MinimizeBtn
+	local TextLabel = Frame.TextLabel
 	local invis_on = false
 	local isMinimized = false
 	local originalSize = Frame.Size
-	local originalPosition = Frame.Position
 	
 	-- Minimize/Maximize functionality
 	local function toggleMinimize()
 		isMinimized = not isMinimized
 		if isMinimized then
 			-- Hide everything except minimize button
-			for _, child in ipairs(Frame:GetChildren()) do
-				if child ~= MinimizeButton and child.Name ~= "TextButton" then
-					child.Visible = false
-				end
-			end
+			TextLabel.Visible = false
 			TextButton.Visible = false
 			Frame.Size = UDim2.new(0, 30, 0, 30)
 			MinimizeButton.Text = "+"
@@ -83,9 +79,8 @@ local function GNXDSUT_fake_script() -- TextButton.LocalScript
 			MinimizeButton.Position = UDim2.new(0, 0, 0, 0)
 		else
 			-- Show everything
-			for _, child in ipairs(Frame:GetChildren()) do
-				child.Visible = true
-			end
+			TextLabel.Visible = true
+			TextButton.Visible = true
 			Frame.Size = originalSize
 			MinimizeButton.Text = "-"
 			MinimizeButton.Size = UDim2.new(0, 30, 0, 30)
